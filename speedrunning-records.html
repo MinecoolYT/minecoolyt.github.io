@@ -23,8 +23,9 @@
         const formattedHours = String(hours).padStart(2, '0');
         const formattedMinutes = String(minutes).padStart(2, '0');
         const formattedSeconds = String(seconds).padStart(2, '0');
-        const formattedMilliseconds = String(millisecondsRemainder).padStart(3, '0').slice(0, 3);
+        const formattedMilliseconds = String(millisecondsRemainder.toFixed(0)).padStart(3, '0')
         if (hours > 0) return `${formattedHours}:${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
+        console.log(formattedMilliseconds);
         return `${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
     }
 
@@ -58,7 +59,7 @@
             chimps.innerText = formatTime(times[i].Chimps);
 
             const total = row.insertCell();
-            total.innerText = formatTime((times[i].Easy + times[i].Medium + times[i].Hard + times[i].Impoppable + times[i].Chimps).toFixed(3));
+            total.innerText = formatTime((times[i].Easy + times[i].Medium + times[i].Hard + times[i].Impoppable + times[i].Chimps));
         }
     }
 
@@ -73,16 +74,17 @@
         const total = row.insertCell();
         average.innerText = "Average";
 
-        const easyAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Easy)).toFixed(3));
-        const mediumAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Medium)).toFixed(3));
-        const hardAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Hard)).toFixed(3));
-        const impopAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Impoppable)).toFixed(3));
-        const chimpsAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Chimps)).toFixed(3));
+        const easyAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Easy)));
+        const mediumAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Medium)));
+        const hardAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Hard)));
+        const impopAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Impoppable)));
+        const chimpsAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Chimps)));
         const totalAverage = easyAverage + mediumAverage + hardAverage + impopAverage + chimpsAverage;
 
         easy.innerText = formatTime(easyAverage);
         medium.innerText = formatTime(mediumAverage);
         hard.innerText = formatTime(hardAverage);
+        console.log(impopAverage);
         impop.innerText = formatTime(impopAverage);
         chimps.innerText = formatTime(chimpsAverage);
         total.innerText = formatTime(totalAverage);
@@ -99,21 +101,21 @@
         const total = row.insertCell();
         secondsLeft.innerText = "Seconds Left until next Barrier.";
 
-        const easyAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Easy)).toFixed(3));
-        const mediumAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Medium)).toFixed(3));
-        const hardAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Hard)).toFixed(3));
-        const impopAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Impoppable)).toFixed(3));
-        const chimpsAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Chimps)).toFixed(3));
+        const easyAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Easy)));
+        const mediumAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Medium)));
+        const hardAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Hard)));
+        const impopAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Impoppable)));
+        const chimpsAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Chimps)));
         const totalAverage = easyAverage + mediumAverage + hardAverage + impopAverage + chimpsAverage;
 
         const mapCount = Object.keys(recordData).length;
 
-        easy.innerText = ((easyAverage.toString().split('.').at(-1) * mapCount / 1000));
-        medium.innerText = ((mediumAverage.toString().split('.').at(-1) * mapCount / 1000));
-        hard.innerText = ((hardAverage.toString().split('.').at(-1) * mapCount / 1000));
-        impop.innerText = ((impopAverage.toString().split('.').at(-1) * mapCount / 1000));
-        chimps.innerText = ((chimpsAverage.toString().split('.').at(-1) * mapCount / 1000));
-        total.innerText = ((totalAverage.toString().split('.').at(-1) * mapCount / 1000));
+        easy.innerText = easyAverage.toFixed(3).toString().split('.').at(-1) * mapCount / 1000;
+        medium.innerText = mediumAverage.toFixed(3).toString().split('.').at(-1) * mapCount / 1000;
+        hard.innerText = hardAverage.toFixed(3).toString().split('.').at(-1) * mapCount / 1000;
+        impop.innerText = impopAverage.toFixed(3).toString().split('.').at(-1) * mapCount / 1000;
+        chimps.innerText = chimpsAverage.toFixed(3).toString().split('.').at(-1) * mapCount / 1000;
+        total.innerText = totalAverage.toFixed(3).toString().split('.').at(-1) * mapCount / 1000;
     }
 
     let recordData = {};
