@@ -1,0 +1,199 @@
+<table id="leaderboard">
+    <tr>
+        <th data-filter-value="map">Map</th>
+        <th data-filter-value="easy">Easy</th>
+        <th data-filter-value="medium">Medium</th>
+        <th data-filter-value="hard">Hard</th>
+        <th data-filter-value="impop">Impoppable</th>
+        <th data-filter-value="chimps">Chimps</th>
+        <th data-filter-value="total">Total</th>
+    </tr>
+</table>
+
+<script>
+    const table = document.getElementById("leaderboard");
+
+    function formatTime(s) {
+        const milliseconds = s * 1000;
+        const hours = Math.floor(milliseconds / 3600000);
+        const minutes = Math.floor((milliseconds % 3600000) / 60000);
+        const seconds = Math.floor((milliseconds % 60000) / 1000);
+        const millisecondsRemainder = milliseconds % 1000;
+
+        const formattedHours = String(hours).padStart(2, '0');
+        const formattedMinutes = String(minutes).padStart(2, '0');
+        const formattedSeconds = String(seconds).padStart(2, '0');
+        const formattedMilliseconds = String(millisecondsRemainder).padStart(3, '0').slice(0, 3);
+        if (hours > 0) return `${formattedHours}:${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
+        return `${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
+    }
+
+    const averageArray = array => array.reduce((a, b) => a + b) / array.length;
+
+    function populateTable() {
+        delete recordData['full game'];
+        console.log(recordData);
+
+        const maps = Object.keys(recordData);
+        const times = Object.values(recordData);
+
+        for (let i = 0; i < maps.length; i++) {
+            const row = table.insertRow();
+            const mapName = row.insertCell();
+            mapName.innerText = maps[i];
+
+            const easy = row.insertCell();
+            easy.innerText = formatTime(times[i].Easy);
+
+            const medium = row.insertCell();
+            medium.innerText = formatTime(times[i].Medium);
+
+            const hard = row.insertCell();
+            hard.innerText = formatTime(times[i].Hard);
+
+            const impop = row.insertCell();
+            impop.innerText = formatTime(times[i].Impoppable);
+
+            const chimps = row.insertCell();
+            chimps.innerText = formatTime(times[i].Chimps);
+
+            const total = row.insertCell();
+            total.innerText = formatTime((times[i].Easy + times[i].Medium + times[i].Hard + times[i].Impoppable + times[i].Chimps).toFixed(3));
+        }
+    }
+
+    function addAverages() {
+        const row = table.insertRow();
+        const average = row.insertCell();
+        const easy = row.insertCell();
+        const medium = row.insertCell();
+        const hard = row.insertCell();
+        const impop = row.insertCell();
+        const chimps = row.insertCell();
+        const total = row.insertCell();
+        average.innerText = "Average";
+
+        const easyAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Easy)).toFixed(3));
+        const mediumAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Medium)).toFixed(3));
+        const hardAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Hard)).toFixed(3));
+        const impopAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Impoppable)).toFixed(3));
+        const chimpsAverage = Number(averageArray(Object.values(recordData).map(diff => diff.Chimps)).toFixed(3));
+
+        easy.innerText = formatTime(easyAverage);
+        medium.innerText = formatTime(mediumAverage);
+        hard.innerText = formatTime(hardAverage);
+        impop.innerText = formatTime(impopAverage);
+        chimps.innerText = formatTime(chimpsAverage);
+        total.innerText = formatTime(easyAverage + mediumAverage + hardAverage + impopAverage + chimpsAverage);
+    }
+
+    function addTimeUntilNextBarrier() {
+        const row = table.insertRow();
+        const secondsLeft = row.insertCell();
+        const easy = row.insertCell();
+        const medium = row.insertCell();
+        const hard = row.insertCell();
+        const impop = row.insertCell();
+        const chimps = row.insertCell();
+        const total = row.insertCell();
+        secondsLeft.innerText = "Seconds Left until next Barrier.";
+
+        const easyTotal = Object.values(recordData).map(diff => diff.Easy).reduce((partialSum, a) => partialSum + a, 0);
+        const mediumTotal = Object.values(recordData).map(diff => diff.Medium).reduce((partialSum, a) => partialSum + a, 0);
+        const hardTotal = Object.values(recordData).map(diff => diff.Hard).reduce((partialSum, a) => partialSum + a, 0);
+        const impopTotal = Object.values(recordData).map(diff => diff.Impoppable).reduce((partialSum, a) => partialSum + a, 0);
+        const chimpsTotal = Object.values(recordData).map(diff => diff.Chimps).reduce((partialSum, a) => partialSum + a, 0);
+
+        easy.innerText = ((easyTotal - 279 * Object.keys(recordData).length)).toFixed(3);
+        medium.innerText = ((mediumTotal - 465 * Object.keys(recordData).length)).toFixed(3);
+        hard.innerText = ((hardTotal - 701 * Object.keys(recordData).length)).toFixed(3);
+        impop.innerText = ((impopTotal - 868 * Object.keys(recordData).length)).toFixed(3);
+        chimps.innerText = ((chimpsTotal - 978 * Object.keys(recordData).length)).toFixed(3);
+        total.innerText = ((easyTotal - 279 * Object.keys(recordData).length + mediumTotal - 465 * Object.keys(recordData).length + hardTotal - 701 * Object.keys(recordData).length + impopTotal - 868 * Object.keys(recordData).length + chimpsTotal - 978 * Object.keys(recordData).length)).toFixed(3);
+    }
+
+    let recordData = {};
+    let originalRecordData = null;
+
+    async function main(url) {
+        const response = await fetch(url);
+        const json = await response.json();
+        const data = json.data;
+        if (data.length === 0) return;
+        for (let i = 0; i < data.length; i++) {
+            const map = data[i].weblink.split('/')[4].split('#')[0].replaceAll('_', ' ');
+            const difficulty = data[i].weblink.split('/')[4].split('#')[1];
+            const time = data[i].runs[0]?.run.times.primary_t || 1800;
+
+            recordData[map] = recordData[map] || {};
+            recordData[map][difficulty] = {};
+            recordData[map][difficulty] = time;
+        }
+        if (json.pagination.links[0].rel === "prev") {
+            populateTable();
+            addAverages();
+            addTimeUntilNextBarrier();
+            document.querySelectorAll('#leaderboard th')
+                .forEach(e => e.addEventListener("click", function () {
+                    if (!originalRecordData) originalRecordData = recordData;
+                    if (e.innerText === "Map") {
+                        recordData = originalRecordData;
+                    }
+                    if (e.innerText === "Easy") {
+                        recordData = Object.fromEntries(Object.entries(recordData).sort((a, b) => (a[1].Easy - b[1].Easy)));
+                    }
+                    if (e.innerText === "Medium") {
+                        recordData = Object.fromEntries(Object.entries(recordData).sort((a, b) => (a[1].Medium - b[1].Medium)));
+                    }
+                    if (e.innerText === "Hard") {
+                        recordData = Object.fromEntries(Object.entries(recordData).sort((a, b) => (a[1].Hard - b[1].Hard)));
+                    }
+                    if (e.innerText === "Impoppable") {
+                        recordData = Object.fromEntries(Object.entries(recordData).sort((a, b) => (a[1].Impoppable - b[1].Impoppable)));
+                    }
+                    if (e.innerText === "Chimps") {
+                        recordData = Object.fromEntries(Object.entries(recordData).sort((a, b) => (a[1].Chimps - b[1].Chimps)));
+                    }
+                    if (e.innerText === "Total") {
+                        console.log('e')
+                        recordData = Object.fromEntries(Object.entries(recordData).sort((a, b) => ((a[1].Easy + a[1].Medium + a[1].Hard + a[1].Impoppable + a[1].Chimps) - (b[1].Easy + b[1].Medium + b[1].Hard + b[1].Impoppable + b[1].Chimps))));
+                    }
+
+                    for (let i = table.rows.length; i > 1; i--) {
+                        table.deleteRow(1);
+                    }
+                    populateTable();
+                    addAverages();
+                    addTimeUntilNextBarrier();
+                }));
+            return;
+        }
+        main(json.pagination.links[0].uri);
+    }
+
+    main('https://www.speedrun.com/api/v1/games/nd2er3ed/records?top=1&max=200&offset=0');
+</script>
+
+<style>
+    html {
+        background-color: black;
+    }
+
+    #leaderboard {
+        width: 100%;
+    }
+
+    table,
+    th,
+    td {
+        background-color: gray;
+        border: 1px solid black;
+        text-align: center;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    th[data-filter-value] {
+        cursor: pointer;
+    }
+</style>
