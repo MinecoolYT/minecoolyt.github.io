@@ -25,7 +25,6 @@
         const formattedSeconds = String(seconds).padStart(2, '0');
         const formattedMilliseconds = String(millisecondsRemainder.toFixed(0)).padStart(3, '0')
         if (hours > 0) return `${formattedHours}:${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
-        console.log(formattedMilliseconds);
         return `${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
     }
 
@@ -84,7 +83,6 @@
         easy.innerText = formatTime(easyAverage);
         medium.innerText = formatTime(mediumAverage);
         hard.innerText = formatTime(hardAverage);
-        console.log(impopAverage);
         impop.innerText = formatTime(impopAverage);
         chimps.innerText = formatTime(chimpsAverage);
         total.innerText = formatTime(totalAverage);
