@@ -43,6 +43,7 @@
             mapName.innerText = maps[i];
 
             const easy = row.insertCell();
+            if (times[i].Easy === 278.205) easy.style['background-color'] = "Lime";
             easy.innerText = formatTime(times[i].Easy);
 
             const medium = row.insertCell();
@@ -180,6 +181,8 @@
 <style>
     html {
         background-color: black;
+        font-family: 'Luckiest Guy';
+        src: url(https://fonts.gstatic.com/s/luckiestguy/v18/_gP_1RrxsjcxVyin9l9n_j2hTd52.woff2) format('woff2');
     }
 
     #leaderboard {
@@ -189,11 +192,12 @@
     table,
     th,
     td {
-        background-color: gray;
+        background-color: #aa99aa;
         border: 1px solid black;
         text-align: center;
         height: 50px;
-        font-size: 20px;
+        font-size: 25px;
+        letter-spacing: 1px;
     }
 
     th[data-filter-value] {
